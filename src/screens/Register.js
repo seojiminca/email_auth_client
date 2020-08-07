@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import authSvg from '../assets/auth.svg';
 import {ToastContainer, toast} from 'react-toastify';
+import axios from 'axios';
 import {Link} from "react-router-dom";
 
 const Register = () => {
@@ -17,9 +18,55 @@ const Register = () => {
     const { name, email, password1, password2, textChange } = formData;
 
     const handleSubmit = e => {
+        e.preventDefault(); //기본설정
+
+        if(name && email && password1){
+            if(password1 === password2){
+                setFormData({...formData, textChange: 'Submitting' });
+                axios
+                    .post('http://localhost:5000/user/register', {
+                        name,
+                        email,
+                        password: password1
+                    })
+                    .then(res => {
+                        setFormData({
+                            ...formData,
+                            //다시 초기화.
+                            name: '',
+                            email:'',
+                            password1: '',
+                            password2: '',
+                            textChange: 'Submitted'
+                        })
+
+                        toast.success(res.data.message);
+                    })
+                    .catch(err => {
+                        //Error 인 상태를 지우고 초기화해줘야되니까.
+                        setFormData({
+                            ...formData,
+                            //다시 초기화.
+                            name: '',
+                            email:'',
+                            password1: '',
+                            password2: '',
+                            textChange: 'Submitted'
+                        })
+                        toast.error(err.response.data.errors);
+                    });
+            }else{
+                toast.error('password doesnt match');
+            }
+        }else{
+            toast.error('Please fill all fields')
+        }
     };
 
-    const handleChange = text => e => {};
+    //값이 들어오면 form 바뀐다. text:사용자입력값. e: each value
+    const handleChange = text => e => {
+        setFormData({...formData, [text]: e.target.value});
+    };
 
     return (
         <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
@@ -100,6 +147,7 @@ const Register = () => {
                     />
                 </div>
             </div>
+
         </div>
     );
 };
