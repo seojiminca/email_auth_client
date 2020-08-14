@@ -1,28 +1,30 @@
-//rsc
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import authSvg from '../assets/auth.svg';
-import {ToastContainer, toast} from 'react-toastify';
 import axios from 'axios';
-import {Link} from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import { isAuth } from '../helpers/auth';
+import { Redirect } from 'react-router-dom';
 
 const Register = () => {
-
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password1: '',
         password2: '',
-        textChange: 'Sign Up' //button 속 텍스트.
-    })
+        textChange: 'Sign Up'
+    });
 
     const { name, email, password1, password2, textChange } = formData;
 
-    const handleSubmit = e => {
-        e.preventDefault(); //기본설정
+    const handleChange = text => e => {
+        setFormData({ ...formData, [text]: e.target.value });
+    };
 
-        if(name && email && password1){
-            if(password1 === password2){
-                setFormData({...formData, textChange: 'Submitting' });
+    const handleSubmit = e => {
+        e.preventDefault();
+        if (name && email && password1) {
+            if (password1 === password2) {
+                setFormData({ ...formData, textChange: 'Submitting' });
                 axios
                     .post('http://localhost:5000/user/register', {
                         name,
@@ -32,53 +34,48 @@ const Register = () => {
                     .then(res => {
                         setFormData({
                             ...formData,
-                            //다시 초기화.
                             name: '',
-                            email:'',
+                            email: '',
                             password1: '',
                             password2: '',
                             textChange: 'Submitted'
-                        })
+                        });
 
                         toast.success(res.data.message);
                     })
                     .catch(err => {
-                        //Error 인 상태를 지우고 초기화해줘야되니까.
                         setFormData({
                             ...formData,
-                            //다시 초기화.
                             name: '',
-                            email:'',
+                            email: '',
                             password1: '',
                             password2: '',
-                            textChange: 'Submitted'
-                        })
+                            textChange: 'Sign Up'
+                        });
+                        console.log(err.response);
                         toast.error(err.response.data.errors);
                     });
-            }else{
-                toast.error('password doesnt match');
+            } else {
+                toast.error("Passwords don't matches");
             }
-        }else{
-            toast.error('Please fill all fields')
+        } else {
+            toast.error('Please fill all fields');
         }
     };
 
-    //값이 들어오면 form 바뀐다. text:사용자입력값. e: each value
-    const handleChange = text => e => {
-        setFormData({...formData, [text]: e.target.value});
-    };
-
     return (
-        <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-            <ToastContainer/>
+        <div className='min-h-screen bg-gray-100 text-gray-900 flex justify-center'>
+            {isAuth() ? <Redirect to='/' /> : null}
+            <ToastContainer />
             <div className='max-w-screen-xl m-0 sm:m-20 bg-white shadow sm:rounded-lg flex justify-center flex-1'>
                 <div className='lg:w-1/2 xl:w-5/12 p-6 sm:p-12'>
                     <div className='mt-12 flex flex-col items-center'>
                         <h1 className='text-2xl xl:text-3xl font-extrabold'>
-                            Sign Up for Jimin
+                            Sign Up for Teddy
                         </h1>
+
                         <form
-                            className={'w-full flex-1 mt-8 text-indigo-500'}
+                            className='w-full flex-1 mt-8 text-indigo-500'
                             onSubmit={handleSubmit}
                         >
                             <div className='mx-auto max-w-xs relative '>
@@ -114,13 +111,12 @@ const Register = () => {
                                     type='submit'
                                     className='mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none'
                                 >
-                                    <i className='fas fa-user-plus fa 1x w-6  -ml-2'/>
+                                    <i className='fas fa-user-plus fa 1x w-6  -ml-2' />
                                     <span className='ml-3'>{textChange}</span>
                                 </button>
                             </div>
                             <div className='my-12 border-b text-center'>
-                                <div
-                                    className='leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2'>
+                                <div className='leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2'>
                                     Or sign with email or social login
                                 </div>
                             </div>
@@ -131,23 +127,21 @@ const Register = () => {
                                     href='/login'
                                     target='_self'
                                 >
-                                    <i className='fas fa-sign-in-alt fa 1x w-6  -ml-2 text-indigo-500'/>
+                                    <i className='fas fa-sign-in-alt fa 1x w-6  -ml-2 text-indigo-500' />
                                     <span className='ml-4'>Sign In</span>
                                 </a>
                             </div>
                         </form>
                     </div>
                 </div>
-                {/*image */}
                 <div className='flex-1 bg-indigo-100 text-center hidden lg:flex'>
-                    {/*안의 내용 없으면 inner closing 가능*/}
                     <div
                         className='m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat'
-                        style={{backgroundImage: `url(${authSvg})`}}
-                    />
+                        style={{ backgroundImage: `url(${authSvg})` }}
+                    ></div>
                 </div>
             </div>
-
+            ;
         </div>
     );
 };
