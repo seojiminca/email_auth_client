@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {ToastContainer, toast} from "react-toastify";
 import {Link} from "react-router-dom";
+import {GoogleLogin} from "react-google-login";
+import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +17,14 @@ const Login = () => {
         setFormData({...formData, [text]: e.target.value});
         console.log(formData);
     };
+
+    const responseGoogle = response => {
+        console.log("----------",response);
+    }
+
+    const responseFacebook = response => {
+        console.log("-----facebook-----",response);
+    }
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -31,6 +41,42 @@ const Login = () => {
                         </h1>
                         <div className='w-full flex-1 mt-8 text-indigo-500'>
                             <div className='flex flex-col items-center'>
+
+                                <GoogleLogin
+                                    clientId={`438725056213-hpfb39mr49n729fkbiq9prdc5ebsoh90.apps.googleusercontent.com`}
+                                    onSuccess={responseGoogle}
+                                    onFailure={responseGoogle}
+                                    cookiePolicy={'single_host_origin'}
+                                    render={renderProps => (
+                                        <button
+                                            onClick={renderProps.onClick}
+                                            disabled={renderProps.disabled}
+                                            className='w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline'
+                                        >
+                                            <div className=' p-2 rounded-full '>
+                                                <i className='fab fa-google' />
+                                            </div>
+                                            <span className='ml-4'>Sign In with Google</span>
+                                        </button>
+                                    )}
+                                />
+
+                                <FacebookLogin
+                                    appId={`1978207028981079`}
+                                    autoLoad={false}
+                                    callback={responseFacebook}
+                                    render={renderProps => (
+                                        <button
+                                            onClick={renderProps.onClick}
+                                            className='w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5'
+                                        >
+                                            <div className=' p-2 rounded-full '>
+                                                <i className='fab fa-facebook' />
+                                            </div>
+                                            <span className='ml-4'>Sign In with Facebook</span>
+                                        </button>
+                                    )}
+                                />
                                 <Link
                                     className='w-full max-w-xs font-bold shadow-sm rounded-lg py-3
            bg-indigo-100 text-gray-800 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5'
